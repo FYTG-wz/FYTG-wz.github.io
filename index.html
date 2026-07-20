@@ -1,1358 +1,618 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-CN">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>声迹·寻根 | 方言保护计划</title>
-    <style>
-        :root {
-            --primary-color: #8c3c2c;
-            --secondary-color: #2c5a8c;
-            --accent-color: #3a7a4a;
-            --light-color: #fef9f0;
-            --dark-color: #2c1810;
-            --text-color: #333;
-            --border-color: #d4b483;
-            --shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
-        }
-        
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-        }
-        
-        html {
-            font-size: 16px;
-            scroll-behavior: smooth;
-        }
-        
-        body {
-            font-family: "SimSun", "Microsoft YaHei", serif;
-            background-color: var(--light-color);
-            color: var(--text-color);
-            line-height: 1.6;
-            overflow-x: hidden;
-            width: 100%;
-            -webkit-text-size-adjust: 100%;
-        }
-        body.modal-open {
-            position: fixed;
-            width: 100%;
-            height: 100%;
-        }
-        
-        /* 测试模态框样式 */
-        .test-modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.85);
-            z-index: 1000;
-            overflow-y: auto;
-        }
-        
-        .test-container {
-            position: relative;
-            background: white;
-            width: 95%;
-            max-width: 500px;
-            margin: 30px auto;
-            border-radius: 15px;
-            overflow: hidden;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
-            animation: modalFadeIn 0.3s ease;
-        }
-        
-        @keyframes modalFadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        .test-header {
-            background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
-            color: white;
-            padding: 20px;
-            text-align: center;
-            position: relative;
-        }
-        
-        .test-close {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            background: rgba(255, 255, 255, 0.2);
-            width: 35px;
-            height: 35px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        
-        .test-close:hover {
-            background: rgba(255, 255, 255, 0.3);
-            transform: scale(1.1);
-        }
-        
-        .test-title {
-            font-size: 1.6rem;
-            margin-bottom: 5px;
-            font-weight: 700;
-        }
-        
-        .test-subtitle {
-            font-size: 0.9rem;
-            opacity: 0.9;
-        }
-        
-        .test-body {
-            padding: 25px;
-        }
-        
-        .question-number {
-            font-size: 1.1rem;
-            color: var(--primary-color);
-            font-weight: bold;
-            margin-bottom: 15px;
-        }
-        
-        .audio-control {
-            background: var(--light-color);
-            border-radius: 10px;
-            padding: 15px;
-            margin-bottom: 20px;
-            text-align: center;
-            border: 1px solid #eee;
-        }
-        
-        .play-btn {
-            background: linear-gradient(to right, var(--primary-color), var(--accent-color));
-            color: white;
-            border: none;
-            padding: 12px 25px;
-            border-radius: 50px;
-            font-size: 1rem;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            transition: all 0.3s ease;
-            font-weight: 600;
-        }
-        
-        .play-btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 5px 15px rgba(139, 60, 44, 0.3);
-        }
-        
-        .options-container {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            margin-bottom: 25px;
-        }
-        
-        .option {
-            padding: 15px;
-            border: 2px solid #eee;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .option:hover {
-            background: #f9f9f9;
-            border-color: #ddd;
-        }
-        
-        .option-letter {
-            width: 30px;
-            height: 30px;
-            background: #f0f0f0;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            color: #666;
-        }
-        
-        .option.correct {
-            background: #e8f5e9;
-            border-color: var(--accent-color);
-        }
-        
-        .option.incorrect {
-            background: #ffebee;
-            border-color: #f44336;
-        }
-        
-        .answer-feedback {
-            background: #f5f5f5;
-            border-radius: 10px;
-            padding: 20px;
-            margin-top: 20px;
-            border-left: 4px solid var(--primary-color);
-        }
-        
-        .correct-answer {
-            font-weight: bold;
-            color: var(--primary-color);
-            margin-bottom: 10px;
-        }
-        
-        .explanation {
-            color: #666;
-            font-size: 0.95rem;
-        }
-        
-        .test-footer {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 25px;
-            padding-top: 20px;
-            border-top: 1px solid #eee;
-        }
-        
-        .nav-btn {
-            background: var(--light-color);
-            border: 2px solid var(--border-color);
-            color: var(--dark-color);
-            padding: 10px 20px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
-        .nav-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-        
-        .nav-btn:hover:not(:disabled) {
-            background: var(--border-color);
-            transform: translateY(-2px);
-        }
-        
-        .test-complete {
-            text-align: center;
-            padding: 40px 20px;
-        }
-        
-        .complete-icon {
-            font-size: 4rem;
-            color: var(--accent-color);
-            margin-bottom: 20px;
-        }
-        
-        .complete-message {
-            font-size: 1.3rem;
-            color: var(--dark-color);
-            margin-bottom: 10px;
-        }
-        
-        .restart-btn {
-            background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
-            color: white;
-            border: none;
-            padding: 12px 30px;
-            border-radius: 50px;
-            font-size: 1rem;
-            cursor: pointer;
-            margin-top: 20px;
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
-        
-        .restart-btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-        }
-        
-        /* 移动端优化 */
-        .scene {
-            min-height: 100vh;
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            padding: 60px 20px;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .cover {
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-            color: white;
-            text-align: center;
-            padding: 40px 20px;
-        }
-        
-        .vertical-title {
-            font-family: "KaiTi", "STKaiti", cursive;
-            font-size: 3.5rem;
-            writing-mode: vertical-rl;
-            text-orientation: upright;
-            letter-spacing: 15px;
-            margin: 30px auto;
-            line-height: 1.2;
-            color: #f0d9b5;
-            text-shadow: 0 0 10px rgba(240, 217, 181, 0.5);
-            height: 70vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        
-        .guide-text {
-            position: absolute;
-            bottom: 40px;
-            left: 0;
-            right: 0;
-            text-align: center;
-            font-size: 1rem;
-            color: rgba(255, 255, 255, 0.8);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 10px;
-            padding: 0 20px;
-        }
-        
-        .scroll-hint {
-            animation: bounce 2s infinite;
-            font-size: 1.2rem;
-        }
-        
-        @keyframes bounce {
-            0%, 20%, 50%, 80%, 100% {transform: translateY(0);}
-            40% {transform: translateY(-8px);}
-            60% {transform: translateY(-4px);}
-        }
-        
-        .scene-1 {
-            background-color: #f5f1e8;
-            padding: 50px 20px;
-        }
-        
-        .dialect-image-container {
-            width: 100%;
-            max-width: 500px;
-            height: 320px;
-            border-radius: 15px;
-            margin: 30px auto;
-            position: relative;
-            overflow: hidden;
-            box-shadow: var(--shadow);
-            background: linear-gradient(145deg, #f0ebe1, #e8e3d7);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .image-frame {
-            width: 100%;
-            height: 100%;
-            border-radius: 15px;
-            overflow: hidden;
-            position: relative;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            border: 1px solid rgba(139, 60, 44, 0.1);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 30px;
-            text-align: center;
-            background: #f8f4ec;
-        }
-        .image-icon-text {
-            font-size: 3rem;
-            color: var(--primary-color);
-            margin-bottom: 20px;
-        }
-        .image-grid-box {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-            width: 100%;
-            max-width: 300px;
-        }
-        .image-grid-item {
-            background: rgba(139, 60, 44, 0.1);
-            padding: 15px;
-            border-radius: 8px;
-        }
-        .image-grid-title {
-            font-size: 1.3rem;
-            color: var(--primary-color);
-            font-weight: bold;
-        }
-        .image-grid-desc {
-            font-size: 0.9rem;
-            color: #666;
-        }
-        
-        .image-overlay {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: linear-gradient(to top, rgba(44, 24, 16, 0.8), transparent);
-            color: white;
-            padding: 20px;
-            font-size: 0.9rem;
-            text-align: center;
-        }
-        
-        .image-title {
-            font-family: "KaiTi", "STKaiti", cursive;
-            font-size: 1.8rem;
-            margin-bottom: 5px;
-            color: #f0d9b5;
-        }
-        
-        .image-description {
-            font-size: 1rem;
-            opacity: 0.9;
-        }
-        
-        .scene-content {
-            width: 100%;
-            max-width: 500px;
-            margin: 0 auto;
-            text-align: center;
-        }
-        
-        .scene-title {
-            font-size: 1.8rem;
-            color: var(--dark-color);
-            margin-bottom: 20px;
-            font-weight: 900;
-            line-height: 1.3;
-        }
-        
-        .scene-text {
-            font-size: 1.1rem;
-            margin-bottom: 30px;
-            color: #555;
-            line-height: 1.6;
-        }
-        
-        .scene-2 {
-            background-color: #e8e3d7;
-            padding: 50px 20px;
-        }
-        
-        .data-highlight {
-            color: var(--primary-color);
-            font-weight: 900;
-            font-size: 1.1em;
-        }
-        
-        .survey-results {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            margin: 30px 0;
-            width: 100%;
-            max-width: 500px;
-        }
-        
-        .data-card {
-            background: white;
-            border-radius: 12px;
-            padding: 20px;
-            box-shadow: var(--shadow);
-            transition: transform 0.3s ease;
-            width: 100%;
-            opacity: 0;
-            transform: translateY(20px);
-        }
-        
-        .data-card:active {
-            transform: scale(0.98);
-        }
-        
-        .data-title {
-            font-size: 1.2rem;
-            color: var(--secondary-color);
-            margin-bottom: 12px;
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 8px;
-        }
-        
-        .data-value {
-            font-size: 2.5rem;
-            font-weight: 900;
-            color: var(--primary-color);
-            margin: 10px 0;
-        }
-        
-        .chart-container {
-            width: 100%;
-            max-width: 500px;
-            height: 250px;
-            margin: 30px auto;
-            position: relative;
-        }
-        
-        .chart-title {
-            text-align: center;
-            margin-bottom: 15px;
-            color: var(--dark-color);
-            font-size: 1.1rem;
-        }
-        
-        .chart {
-            width: 100%;
-            height: 200px;
-            background: white;
-            border-radius: 12px;
-            padding: 15px;
-            box-shadow: var(--shadow);
-            display: flex;
-            align-items: flex-end;
-            justify-content: space-around;
-        }
-        
-        .chart-bar {
-            width: 50px;
-            background: linear-gradient(to top, var(--primary-color), var(--accent-color));
-            border-radius: 5px 5px 0 0;
-            position: relative;
-            transition: height 1.5s ease;
-            height: 0%;
-        }
-        
-        .chart-label {
-            position: absolute;
-            bottom: -25px;
-            left: 0;
-            width: 100%;
-            text-align: center;
-            font-weight: bold;
-            color: var(--dark-color);
-            font-size: 0.9rem;
-        }
-        
-        .scene-3 {
-            background-color: #f0ebe1;
-            padding: 50px 20px;
-        }
-        
-        .interview-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 30px;
-            margin: 30px 0;
-            width: 100%;
-            max-width: 500px;
-        }
-        
-        .interviewee {
-            text-align: center;
-            cursor: pointer;
-            transition: transform 0.3s ease;
-            width: 100%;
-            max-width: 300px;
-        }
-        
-        .interviewee:active {
-            transform: scale(0.95);
-        }
-        
-        .avatar {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
-            margin: 0 auto 15px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 2.8rem;
-            box-shadow: var(--shadow);
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .avatar::before {
-            content: "";
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.1);
-            border-radius: 50%;
-        }
-        
-        .generation {
-            font-size: 1.1rem;
-            font-weight: bold;
-            color: var(--dark-color);
-            margin-bottom: 10px;
-        }
-        
-        .quote {
-            font-style: italic;
-            color: #666;
-            max-width: 100%;
-            margin: 0 auto;
-            opacity: 0;
-            transition: opacity 0.5s ease, max-height 0.5s ease;
-            max-height: 0;
-            margin-top: 0;
-            font-size: 0.95rem;
-            padding: 0 10px;
-            background: rgba(255, 255, 255, 0.7);
-            border-radius: 8px;
-        }
-        .quote.open {
-            opacity: 1;
-            max-height: 200px;
-            margin-top: 10px;
-            padding: 10px;
-        }
-        
-        .scene-4 {
-            background-color: #e8e3d7;
-            padding: 50px 20px;
-        }
-        
-        .challenge-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 25px;
-            margin: 30px 0;
-            width: 100%;
-            max-width: 500px;
-        }
-        
-        .challenge-card {
-            width: 100%;
-            max-width: 400px;
-            height: 180px;
-            background: white;
-            border-radius: 15px;
-            padding: 25px;
-            box-shadow: var(--shadow);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .challenge-card:active {
-            transform: scale(0.98);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-        }
-        
-        .challenge-icon {
-            font-size: 2.8rem;
-            color: var(--primary-color);
-            margin-bottom: 15px;
-        }
-        
-        .challenge-title {
-            font-size: 1.4rem;
-            color: var(--dark-color);
-            margin-bottom: 10px;
-        }
-        
-        .scene-5 {
-            background-color: #f5f1e8;
-            padding: 50px 20px;
-        }
-        
-        .value-container {
-            display: flex;
-            flex-direction: column;
-            gap: 25px;
-            width: 100%;
-            max-width: 500px;
-            margin: 30px auto;
-        }
-        
-        .value-card {
-            background: rgba(255, 255, 255, 0.85);
-            border-radius: 12px;
-            padding: 25px;
-            box-shadow: var(--shadow);
-            position: relative;
-            overflow: hidden;
-            min-height: 200px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
-        
-        .value-card::before {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200"><path d="M20,100 Q100,20 180,100 T180,100" stroke="#8c3c2c" stroke-width="1" fill="none" opacity="0.1"/></svg>') center/cover no-repeat;
-            opacity: 0.1;
-            z-index: 0;
-        }
-        
-        .value-title {
-            font-size: 1.4rem;
-            color: var(--primary-color);
-            margin-bottom: 12px;
-            font-weight: 900;
-        }
-        
-        .value-content {
-            font-size: 1rem;
-            color: #555;
-            position: relative;
-            z-index: 1;
-            line-height: 1.6;
-        }
-        
-        .scene-6 {
-            background-color: #2c1810;
-            color: white;
-            text-align: center;
-            padding: 50px 20px;
-        }
-        
-        .letter-container {
-            width: 100%;
-            max-width: 500px;
-            margin: 0 auto;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 15px;
-            padding: 25px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-            backdrop-filter: blur(5px);
-        }
-        
-        .role-cards {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 20px;
-            margin: 30px 0;
-        }
-        
-        .role-card {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
-            padding: 20px;
-            width: 100%;
-            max-width: 400px;
-            transition: all 0.3s ease;
-        }
-        
-        .role-card:active {
-            background: rgba(255, 255, 255, 0.2);
-            transform: scale(0.98);
-        }
-        
-        .role-title {
-            font-size: 1.2rem;
-            color: #f0d9b5;
-            margin-bottom: 10px;
-        }
-        
-        .ending {
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-            color: white;
-            text-align: center;
-            padding: 60px 20px;
-            min-height: 100vh;
-        }
-        
-        .ending-title {
-            font-family: "KaiTi", "STKaiti", cursive;
-            font-size: 2.2rem;
-            margin-bottom: 25px;
-            color: #f0d9b5;
-            line-height: 1.3;
-        }
-        
-        .ending-text {
-            font-size: 1.1rem;
-            max-width: 500px;
-            margin: 0 auto 30px;
-            line-height: 1.6;
-        }
-        
-        .action-button {
-            background: linear-gradient(to right, var(--primary-color), var(--accent-color));
-            color: white;
-            border: none;
-            padding: 15px 35px;
-            font-size: 1.1rem;
-            border-radius: 50px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-family: "SimSun", "Microsoft YaHei", serif;
-            font-weight: 600;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .action-button:active {
-            transform: scale(0.95);
-            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
-        }
-        
-        /* 移动端导航指示器 */
-        .mobile-nav {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            z-index: 100;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 5px;
-            opacity: 0.7;
-        }
-        
-        .nav-dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            background-color: rgba(139, 60, 44, 0.5);
-            transition: all 0.3s ease;
-            cursor: pointer;
-        }
-        
-        .nav-dot.active {
-            background-color: var(--primary-color);
-            transform: scale(1.3);
-        }
-        
-        /* 移动端菜单按钮 */
-        .mobile-menu-btn {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 101;
-            background: rgba(139, 60, 44, 0.9);
-            color: white;
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
-        }
-        
-        .mobile-menu {
-            position: fixed;
-            top: 0;
-            right: -100%;
-            width: 80%;
-            max-width: 300px;
-            height: 100%;
-            background: rgba(44, 24, 16, 0.95);
-            z-index: 102;
-            padding: 80px 30px;
-            transition: right 0.4s ease;
-            backdrop-filter: blur(10px);
-        }
-        
-        .mobile-menu.active {
-            right: 0;
-        }
-        
-        .menu-list {
-            list-style: none;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-        
-        .menu-item {
-            color: #f0d9b5;
-            font-size: 1.2rem;
-            padding: 10px 0;
-            border-bottom: 1px solid rgba(240, 217, 181, 0.2);
-            cursor: pointer;
-        }
-        
-        .menu-item:active {
-            color: white;
-        }
-        
-        .menu-close {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            color: white;
-            font-size: 1.5rem;
-            cursor: pointer;
-        }
-        
-        /* 触摸反馈优化 */
-        button, .challenge-card, .interviewee, .role-card, .data-card {
-            -webkit-user-select: none;
-            user-select: none;
-        }
-        
-        /* 小屏幕进一步优化 */
-        @media (max-width: 360px) {
-            html {
-                font-size: 14px;
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>方言发音挑战 - 温州话 & 海南话</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome 图标 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .recording {
+                @apply animate-pulse bg-red-500 text-white;
             }
-            
-            .vertical-title {
-                font-size: 2.8rem;
-                letter-spacing: 12px;
+            .swipe-area {
+                @apply cursor-grab active:cursor-grabbing;
             }
-            
-            .scene-title {
-                font-size: 1.6rem;
+            .progress-bar {
+                @apply h-2 bg-gray-200 rounded-full overflow-hidden;
             }
-            
-            .dialect-image-container {
-                height: 260px;
-            }
-            
-            .avatar {
-                width: 100px;
-                height: 100px;
-                font-size: 2.2rem;
-            }
-            
-            .challenge-card {
-                height: 160px;
-                padding: 20px;
-            }
-            
-            .value-card {
-                padding: 20px;
-                min-height: 180px;
-            }
-        }
-        
-        @media (max-height: 500px) and (orientation: landscape) {
-            .scene {
-                min-height: 150vh;
-                padding: 40px 20px;
-            }
-            
-            .vertical-title {
-                height: 50vh;
-            }
-            
-            .guide-text {
-                bottom: 20px;
-            }
-            
-            .dialect-image-container {
-                height: 240px;
+            .progress-fill {
+                @apply h-full bg-blue-500 transition-all duration-100;
             }
         }
     </style>
 </head>
-<body>
-    <!-- 温州话听力测试模态框 -->
-    <div id="wenzhouTestModal" class="test-modal">
-        <div class="test-container">
-            <div class="test-header">
-                <div class="test-close" onclick="closeWenzhouTest()">
-                    ×
-                </div>
-                <h2 class="test-title">温州话听力测试</h2>
-                <p class="test-subtitle">共5题 | 测试你对温州话的理解</p>
-            </div>
-            <div class="test-body">
-                <div id="wenzhouQuestionContainer">
-                    <!-- 题目内容将通过JS动态生成 -->
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <!-- 海南话听力测试模态框 -->
-    <div id="hainanTestModal" class="test-modal">
-        <div class="test-container">
-            <div class="test-header">
-                <div class="test-close" onclick="closeHainanTest()">
-                    ×
-                </div>
-                <h2 class="test-title">海南话听力测试</h2>
-                <p class="test-subtitle">共5题 | 测试你对海南话的理解</p>
-            </div>
-            <div class="test-body">
-                <div id="hainanQuestionContainer">
-                    <!-- 题目内容将通过JS动态生成 -->
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <!-- 移动端菜单按钮 -->
-    <div class="mobile-menu-btn" id="menuBtn">
-        ☰
-    </div>
-    
-    <!-- 移动端菜单 -->
-    <div class="mobile-menu" id="mobileMenu">
-        <div class="menu-close" id="menuClose">
-            ×
-        </div>
-        <ul class="menu-list">
-            <li class="menu-item" data-target="#cover">封面</li>
-            <li class="menu-item" data-target="#scene-1">第一幕：叩问</li>
-            <li class="menu-item" data-target="#scene-2">第二幕：洞察</li>
-            <li class="menu-item" data-target="#scene-3">第三幕：对照</li>
-            <li class="menu-item" data-target="#scene-4">第四幕：试音</li>
-            <li class="menu-item" data-target="#scene-5">第五幕：本味</li>
-            <li class="menu-item" data-target="#scene-6">第六幕：接力</li>
-            <li class="menu-item" data-target="#ending">结尾</li>
-        </ul>
-    </div>
-    
-    <!-- 封面：声迹 · 寻根 -->
-    <section id="cover" class="scene cover">
-        <div class="vertical-title">声<br>迹<br>·<br>寻<br>根</div>
-        <div class="guide-text">
-            <p>循声启程，开始寻踪</p>
-            <div class="scroll-hint">↓</div>
-        </div>
-    </section>
-    
-    <!-- 第一幕：叩问 -->
-    <section id="scene-1" class="scene scene-1">
-        <div class="scene-content">
-            <h2 class="scene-title">你的乡音，还在线吗？</h2>
-            <p class="scene-text">它是否已沦为记忆里一段静默的忙音，再也无法拨通你与故乡的链接？</p>
-            
-            <div class="dialect-image-container">
-                <div class="image-frame">
-                    <div class="image-icon-text">🗣️</div>
-                    <div class="image-grid-box">
-                        <div class="image-grid-item">
-                            <div class="image-grid-title">土壤</div>
-                            <div class="image-grid-desc">文化根基</div>
-                        </div>
-                        <div class="image-grid-item">
-                            <div class="image-grid-title">音影</div>
-                            <div class="image-grid-desc">声像记忆</div>
-                        </div>
-                        <div class="image-grid-item">
-                            <div class="image-grid-title">土壤</div>
-                            <div class="image-grid-desc">语言生态</div>
-                        </div>
-                        <div class="image-grid-item">
-                            <div class="image-grid-title">音</div>
-                            <div class="image-grid-desc">声音传承</div>
-                        </div>
-                    </div>
-                    <div class="image-overlay">
-                        <div class="image-title">方言保护</div>
-                        <div class="image-description">方言是文化的土壤，音影是记忆的载体</div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="guide-text">
-                <p>向下滑动</p>
-                <div class="scroll-hint">↓</div>
-            </div>
-        </div>
-    </section>
-    
-    <!-- 第二幕：洞察 -->
-    <section id="scene-2" class="scene scene-2">
-        <div class="scene-content">
-            <h2 class="scene-title">这不是预言，是一次对"静默"的测绘</h2>
-            <p class="scene-text">基于 <span class="data-highlight">300</span> 份真实的回声，我们描摹出05后一代与家乡话之间，那道正在扩大的声轨断层。</p>
-            
-            <div class="survey-results">
-                <div class="data-card">
-                    <h3 class="data-title">流利使用方言的05后</h3>
-                    <div class="data-value">23%</div>
-                    <p>在我们调查的05后中，仅23%的人能流利使用方言交流</p>
-                </div>
-                
-                <div class="data-card">
-                    <h3 class="data-title">日常使用方言的频率</h3>
-                    <div class="data-value">17%</div>
-                    <p>只有17%的05后会在日常生活中经常使用方言</p>
-                </div>
-                
-                <div class="data-card">
-                    <h3 class="data-title">愿意传承方言的意愿</h3>
-                    <div class="data-value">68%</div>
-                    <p>虽然有68%的年轻人表示愿意学习并传承方言</p>
-                </div>
-            </div>
-            
-            <div class="chart-container">
-                <h3 class="chart-title">三代人方言使用频率对比</h3>
-                <div class="chart">
-                    <div class="chart-bar" data-value="90">
-                        <div class="chart-label">祖辈</div>
-                    </div>
-                    <div class="chart-bar" data-value="60">
-                        <div class="chart-label">父辈</div>
-                    </div>
-                    <div class="chart-bar" data-value="17">
-                        <div class="chart-label">05后</div>
-                    </div>
-                </div>
-            </div>
-            <div class="guide-text">
-                <p>向下滑动</p>
-                <div class="scroll-hint">↓</div>
-            </div>
-        </div>
-    </section>
-    
-    <!-- 第三幕：对照 -->
-    <section id="scene-3" class="scene scene-3">
-        <div class="scene-content">
-            <h2 class="scene-title">三代人，三幅渐淡的声纹</h2>
-            <p class="scene-text">点击头像，开启一场跨越时空的对话。聆听同一句乡音，如何在三条声纹的岔路上回荡。</p>
-            
-            <div class="interview-container">
-                <div class="interviewee" onclick="toggleQuote(this)">
-                    <div class="avatar">👤</div>
-                    <div class="generation">祖辈 (70岁以上)</div>
-                    <div class="quote">"我们那时候，全村人都说一样的土话，那是我们的根。"</div>
-                </div>
-                
-                <div class="interviewee" onclick="toggleQuote(this)">
-                    <div class="avatar">👤</div>
-                    <div class="generation">父辈 (40-60岁)</div>
-                    <div class="quote">"我们会对父母说方言，但对孩子就说普通话了，怕他们跟不上时代。"</div>
-                </div>
-                
-                <div class="interviewee" onclick="toggleQuote(this)">
-                    <div class="avatar">👤</div>
-                    <div class="generation">05后 (18岁以下)</div>
-                    <div class="quote">"我能听懂一些，但不会说了。好像也没什么必要，大家不都说普通话吗？"</div>
-                </div>
-            </div>
-            
-            <div class="guide-text">
-                <p>向下滑动</p>
-                <div class="scroll-hint">↓</div>
-            </div>
-        </div>
-    </section>
-    
-    <!-- 第四幕：试音 -->
-    <section id="scene-4" class="scene scene-4">
-        <div class="scene-content">
-            <h2 class="scene-title">你，还能接上这份频率吗？</h2>
-            <p class="scene-text">这既是一次接收测试，也是一次声纹复刻。此刻，你定义的正是你与根源的连接本身。</p>
-            
-            <div class="challenge-container">
-                <div class="challenge-card" onclick="startWenzhouTest()">
-                    <div class="challenge-icon">🎧</div>
-                    <h3 class="challenge-title">温州话听力测试</h3>
-                    <p>播放音频，选择对应的普通话意思</p>
-                </div>
-                
-                <div class="challenge-card" onclick="startHainanTest()">
-                    <div class="challenge-icon">🎧</div>
-                    <h3 class="challenge-title">海南话听力测试</h3>
-                    <p>播放音频，选择对应的普通话意思</p>
-                </div>
-            </div>
-            
-            <div class="guide-text">
-                <p>向下滑动</p>
-                <div class="scroll-hint">↓</div>
-            </div>
-        </div>
-    </section>
-    
-    <!-- 第五幕：本味 -->
-    <section id="scene-5" class="scene scene-5">
-        <div class="scene-content">
-            <h2 class="scene-title">我们竭力保留的，究竟是什么？</h2>
-            <p class="scene-text">它远非一种口音那么简单。它是一切"标准音"无法容纳的：时间的容器，空间的坐标，集体灵魂最生动的表达。</p>
-            
-            <div class="value-container">
-                <div class="value-card">
-                    <h3 class="value-title">语言的活化石</h3>
-                    <p class="value-content">一句方言，可能就是一段走失了千年的古文。许多方言保留了古汉语的发音、词汇和语法，它们是语言学家眼中的"活化石"。消失一种方言，可能就永久关闭了一扇回望华夏言语流变史的窗。</p>
-                </div>
-                
-                <div class="value-card">
-                    <h3 class="value-title">地方文化的基因库</h3>
-                    <p class="value-content">方言里封存着一个地方的历史记忆、生活方式和世界观。民歌、谚语、民间故事都以方言为载体。失去方言，就等于切断了与地方文化传统的血脉联系。</p>
-                </div>
-                
-                <div class="value-card">
-                    <h3 class="value-title">身份认同的密码</h3>
-                    <p class="value-content">乡音是每个人身份认同的重要组成部分。一句地道的家乡话，能瞬间唤起共同记忆和归属感。在全球化时代，方言成为抵抗文化同质化的重要力量。</p>
-                </div>
-            </div>
-            
-            <div class="guide-text">
-                <p>向下滑动</p>
-                <div class="scroll-hint">↓</div>
-            </div>
-        </div>
-    </section>
-    
-    <!-- 第六幕：接力 -->
-    <section id="scene-6" class="scene scene-6">
-        <div class="scene-content">
-            <h2 class="scene-title">守护声迹，你站在哪个位置？</h2>
-            <p class="scene-text">文化的根脉，需要每一个具体的你来续写。</p>
-            
-            <div class="letter-container">
-                <h3 style="margin-bottom: 20px; color: #f0d9b5; font-size: 1.2rem;">致屏幕前的你：</h3>
-                
-                <div class="role-cards">
-                    <div class="role-card">
-                        <h4 class="role-title">如果你是年轻人</h4>
-                        <p>从一句问候开始，重连血脉。主动向长辈学习方言，在家庭聚会中使用。</p>
-                    </div>
-                    
-                    <div class="role-card">
-                        <h4 class="role-title">如果你已成为家长</h4>
-                        <p>让家，成为方言最初的摇篮。与孩子用方言交流，创造双语环境。</p>
-                    </div>
-                    
-                    <div class="role-card">
-                        <h4 class="role-title">如果你是教育或文化工作者</h4>
-                        <p>搭建一座桥，让方言走进更广阔的世界。开发方言课程，组织方言文化活动。</p>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="guide-text" style="margin-top: 30px;">
-                <p>故事即将抵达终点，但行动刚刚开始</p>
-                <div class="scroll-hint">↓</div>
-            </div>
-        </div>
-    </section>
-    
-    <!-- 结尾 -->
-    <section id="ending" class="scene ending">
-        <h2 class="ending-title">守护这条声迹</h2>
-        <p class="ending-text">让故乡的回响，永不掉线。<br>代代接力，以声音为足迹，将根脉延伸。</p>
-        
-        <button class="action-button" onclick="shareStory()">
-            ↗ 分享这个故事
+<body class="bg-gray-50 min-h-screen flex flex-col items-center justify-start p-4 md:p-8">
+    <!-- 关闭按钮 -->
+    <div class="w-full max-w-md md:max-w-lg flex justify-end mb-4">
+        <button id="closeBtn" class="text-gray-600 hover:text-red-500 text-2xl transition-colors">
+            <i class="fas fa-times"></i>
         </button>
+    </div>
+
+    <!-- 标题区域 -->
+    <div class="w-full max-w-md md:max-w-lg text-center mb-6">
+        <h1 class="text-2xl md:text-3xl font-bold text-gray-800">方言发音挑战</h1>
+        <p class="text-gray-600 mt-2">温州话 & 海南话 | 共5题</p>
+    </div>
+
+    <!-- 兼容性提示 -->
+    <div id="compatibilityAlert" class="hidden w-full max-w-md md:max-w-lg bg-yellow-50 border border-yellow-200 rounded-lg p-3 mb-4 text-yellow-800 text-sm">
+        <i class="fas fa-exclamation-triangle mr-2"></i>
+        <span>你的浏览器可能不支持部分功能，请使用Chrome、Edge或Firefox浏览器</span>
+    </div>
+
+    <!-- 题目容器 -->
+    <div id="questionContainer" class="w-full max-w-md md:max-w-lg bg-white rounded-xl shadow-md p-6 md:p-8 swipe-area" 
+         style="touch-action: pan-y; user-select: none;">
+        <!-- 题目序号 -->
+        <div id="questionNumber" class="text-lg font-semibold text-gray-700 mb-4">第1题</div>
         
-        <div style="margin-top: 50px; font-size: 0.85rem; opacity: 0.7;">
-            <p>声迹·寻根 | 方言保护计划 © 2023</p>
+        <!-- 音频播放区域 -->
+        <div class="mb-6">
+            <button id="playAudioBtn" class="bg-blue-500 hover:bg-blue-600 text-white py-2 px-6 rounded-lg flex items-center justify-center gap-2 transition-colors mb-3">
+                <i class="fas fa-volume-up"></i>
+                <span>播放参考发音</span>
+            </button>
+            <!-- 示例音频（可直接播放） -->
+            <audio id="audioPlayer" controls class="w-full mt-2 hidden">
+                <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
+                你的浏览器不支持音频播放
+            </audio>
+            <!-- 显示音频控件 -->
+            <div id="audioFallback" class="w-full mt-2">
+                <audio controls class="w-full">
+                    <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
+                    你的浏览器不支持音频播放
+                </audio>
+            </div>
         </div>
-    </section>
-    
-    <!-- 移动端导航指示器 -->
-    <div class="mobile-nav" id="mobileNav">
-        <div class="nav-dot" data-target="#cover"></div>
-        <div class="nav-dot" data-target="#scene-1"></div>
-        <div class="nav-dot" data-target="#scene-2"></div>
-        <div class="nav-dot" data-target="#scene-3"></div>
-        <div class="nav-dot" data-target="#scene-4"></div>
-        <div class="nav-dot" data-target="#scene-5"></div>
-        <div class="nav-dot" data-target="#scene-6"></div>
-        <div class="nav-dot" data-target="#ending"></div>
+
+        <!-- 录音区域 -->
+        <div class="mb-8">
+            <div class="flex flex-col items-center">
+                <!-- 录音按钮 -->
+                <button id="recordBtn" class="w-16 h-16 rounded-full bg-gray-200 hover:bg-gray-300 flex items-center justify-center text-3xl mb-4 transition-all">
+                    <i class="fas fa-microphone text-gray-700"></i>
+                </button>
+                
+                <!-- 倒计时区域 -->
+                <div id="timerContainer" class="hidden w-full mb-3">
+                    <p class="text-center text-gray-600 mb-1">录音倒计时: <span id="timerText" class="font-bold">15</span> 秒</p>
+                    <div class="progress-bar">
+                        <div id="progressBar" class="progress-fill w-full"></div>
+                    </div>
+                </div>
+                
+                <!-- 录音状态提示 -->
+                <p id="recordStatus" class="text-gray-500 text-sm hidden">正在录音，请说出你听到的方言...</p>
+                
+                <!-- 录音权限提示 -->
+                <p id="permissionTip" class="text-blue-500 text-sm mt-2 hidden">
+                    <i class="fas fa-info-circle mr-1"></i> 点击录音按钮后请允许麦克风权限
+                </p>
+            </div>
+        </div>
+
+        <!-- 检测结果区域 -->
+        <div id="resultContainer" class="hidden p-4 rounded-lg bg-gray-50 border border-gray-200 mt-4">
+            <h3 class="font-semibold text-gray-800 mb-2">发音检测结果</h3>
+            <p class="mb-2">
+                <span class="text-gray-600">标准度评分：</span>
+                <span id="scoreText" class="font-bold text-green-600">0</span> 分
+            </p>
+            <p class="mb-2">
+                <span class="text-gray-600">你的发音识别：</span>
+                <span id="userSpeechText" class="font-medium">-</span>
+            </p>
+            <p class="mb-1">
+                <span class="text-gray-600">正确释义：</span>
+                <span id="correctMeaningText" class="font-medium">-</span>
+            </p>
+            <p class="text-gray-500 text-sm mt-1">
+                <span class="text-gray-600">方言说明：</span>
+                <span id="dialectExplanationText">-</span>
+            </p>
+        </div>
+
+        <!-- 滑动提示 -->
+        <div class="text-center text-gray-400 text-sm mt-6">
+            <i class="fas fa-arrow-left"></i> 向左滑动进入下一题
+            <p class="mt-1 text-xs">PC端可按住鼠标左键向左拖动</p>
+        </div>
+    </div>
+
+    <!-- 完成提示 -->
+    <div id="completionMessage" class="hidden w-full max-w-md md:max-w-lg bg-white rounded-xl shadow-md p-6 md:p-8 text-center mt-8">
+        <h2 class="text-xl font-bold text-green-600 mb-4">挑战完成！</h2>
+        <p class="text-gray-700 mb-4">你已完成所有5道方言发音挑战题</p>
+        <p class="text-gray-600 mb-6">总平均分：<span id="totalScore" class="font-bold">0</span> 分</p>
+        <button id="restartBtn" class="bg-green-500 hover:bg-green-600 text-white py-2 px-6 rounded-lg transition-colors">
+            重新开始
+        </button>
     </div>
 
     <script>
-        // ==================== 温州话听力测试 ====================
-        const wenzhouQuestions = [
+        // 题目数据
+        const questions = [
             {
                 id: 1,
+                dialect: "温州话",
                 audioUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
-                question: "听听这段温州话是什么意思？",
-                options: [
-                    { text: "吃饭了吗？", isCorrect: false },
-                    { text: "你去哪里？", isCorrect: true },
-                    { text: "今天天气很好", isCorrect: false }
-                ],
-                correctText: "你去哪里？",
-                explanation: "温州话「你到何宕去？」(nì dào gā dāng kè?)，「何宕」是温州话里「哪里」的意思，是日常询问去向的常用语。"
+                dialectPhrase: "你到何宕去？",
+                standardText: "你去哪里？",
+                meaning: "你去哪里？",
+                explanation: "温州话「你到何宕去？」(nì dào gā dāng kè?) 是日常询问去向的常用语，「何宕」表示「哪里」。"
             },
             {
                 id: 2,
+                dialect: "海南话",
                 audioUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3",
-                question: "听听这段温州话是什么意思？",
-                options: [
-                    { text: "多少钱？", isCorrect: true },
-                    { text: "不用谢", isCorrect: false },
-                    { text: "没关系", isCorrect: false }
-                ],
-                correctText: "多少钱？",
-                explanation: "温州话「几多钿？」(gé duō di?)，「钿」在温州话中特指钱，这是购物时询问价格的经典表达。"
+                dialectPhrase: "早晨",
+                standardText: "早上好",
+                meaning: "早上好",
+                explanation: "海南话「早晨」(zǎo sén) 是经典的日常问候语，发音与普通话有明显区别。"
             },
             {
                 id: 3,
+                dialect: "温州话",
                 audioUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3",
-                question: "听听这段温州话是什么意思？",
-                options: [
-                    { text: "回家了", isCorrect: false },
-                    { text: "慢慢来", isCorrect: true },
-                    { text: "快点走", isCorrect: false }
-                ],
-                correctText: "慢慢来",
-                explanation: "温州话「慢慢趙」(mā mā jiào)，「趙」作为语气助词，表达让对方不要着急的意思。"
+                dialectPhrase: "几多钿？",
+                standardText: "多少钱？",
+                meaning: "多少钱？",
+                explanation: "温州话「几多钿？」(gé duō di?) 是购物时询问价格的常用表达，「钿」指钱。"
             },
             {
                 id: 4,
+                dialect: "海南话",
                 audioUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3",
-                question: "听听这段温州话是什么意思？",
-                options: [
-                    { text: "早上好", isCorrect: false },
-                    { text: "谢谢", isCorrect: true },
-                    { text: "再见", isCorrect: false }
-                ],
-                correctText: "谢谢",
-                explanation: "温州话「难为你」(nān wéi nì)，是温州地区表达感谢最常用的说法，语气真诚亲切。"
+                dialectPhrase: "食糜未？",
+                standardText: "吃饭了吗？",
+                meaning: "吃饭了吗？",
+                explanation: "海南话「食糜未？」(jia bō bō?) 是海南最具代表性的日常问候语，「糜」指粥/饭。"
             },
             {
                 id: 5,
+                dialect: "温州话",
                 audioUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3",
-                question: "听听这段温州话是什么意思？",
-                options: [
-                    { text: "我吃饱了", isCorrect: true },
-                    { text: "我饿了", isCorrect: false },
-                    { text: "我要喝水", isCorrect: false }
-                ],
-                correctText: "我吃饱了",
-                explanation: "温州话「我食饱爻」(ngǒ wé bāo gāo)，「爻」是温州话特有的时态助词，表示动作完成。"
+                dialectPhrase: "慢慢趙",
+                standardText: "慢慢来",
+                meaning: "慢慢来",
+                explanation: "温州话「慢慢趙」(mā mā jiào) 表示让对方不要着急，「趙」在这里作为语气助词。"
             }
         ];
 
-        // ==================== 海南话听力测试 ====================
-        const hainanQuestions = [
-            {
-                id: 1,
-                audioUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
-                question: "听听这段海南话是什么意思？",
-                options: [
-                    { text: "早上好", isCorrect: true },
-                    { text: "谢谢", isCorrect: false
+        // 全局变量
+        let currentQuestionIndex = 0;
+        let isRecording = false;
+        let mediaRecorder = null;
+        let audioChunks = [];
+        let timerInterval = null;
+        let remainingTime = 15;
+        let scores = [];
+        let startX = 0;
+        
+        // DOM元素
+        const elements = {
+            questionContainer: document.getElementById('questionContainer'),
+            questionNumber: document.getElementById('questionNumber'),
+            playAudioBtn: document.getElementById('playAudioBtn'),
+            audioPlayer: document.getElementById('audioPlayer'),
+            recordBtn: document.getElementById('recordBtn'),
+            timerContainer: document.getElementById('timerContainer'),
+            timerText: document.getElementById('timerText'),
+            progressBar: document.getElementById('progressBar'),
+            recordStatus: document.getElementById('recordStatus'),
+            resultContainer: document.getElementById('resultContainer'),
+            scoreText: document.getElementById('scoreText'),
+            userSpeechText: document.getElementById('userSpeechText'),
+            correctMeaningText: document.getElementById('correctMeaningText'),
+            dialectExplanationText: document.getElementById('dialectExplanationText'),
+            closeBtn: document.getElementById('closeBtn'),
+            completionMessage: document.getElementById('completionMessage'),
+            totalScore: document.getElementById('totalScore'),
+            restartBtn: document.getElementById('restartBtn'),
+            compatibilityAlert: document.getElementById('compatibilityAlert'),
+            permissionTip: document.getElementById('permissionTip')
+        };
+
+        // 初始化页面
+        document.addEventListener('DOMContentLoaded', () => {
+            // 检测浏览器兼容性
+            checkBrowserCompatibility();
+            
+            // 初始化第一题
+            initCurrentQuestion();
+            
+            // 绑定事件
+            bindEvents();
+            
+            // 显示权限提示
+            elements.permissionTip.classList.remove('hidden');
+        });
+
+        // 检查浏览器兼容性
+        function checkBrowserCompatibility() {
+            // 检查MediaRecorder支持
+            if (!window.MediaRecorder) {
+                elements.compatibilityAlert.classList.remove('hidden');
+                elements.recordBtn.disabled = true;
+                elements.recordBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                alert('⚠️ 你的浏览器不支持录音功能，请使用Chrome、Microsoft Edge或Firefox浏览器');
+            }
+            
+            // 检查语音识别支持
+            if (!('SpeechRecognition' in window || 'webkitSpeechRecognition' in window)) {
+                elements.compatibilityAlert.classList.remove('hidden');
+                alert('⚠️ 你的浏览器不支持语音识别功能，无法检测发音标准度');
+            }
+        }
+
+        // 绑定所有事件
+        function bindEvents() {
+            // 播放音频
+            elements.playAudioBtn.addEventListener('click', () => {
+                elements.audioPlayer.play().catch(error => {
+                    alert('音频播放失败，请检查网络或浏览器设置');
+                    console.error('音频播放错误:', error);
+                });
+            });
+
+            // 录音按钮
+            elements.recordBtn.addEventListener('click', toggleRecording);
+
+            // 关闭按钮
+            elements.closeBtn.addEventListener('click', () => {
+                if (confirm('确定要退出挑战吗？')) {
+                    stopRecording();
+                    window.location.reload();
+                }
+            });
+
+            // 重新开始按钮
+            elements.restartBtn.addEventListener('click', () => {
+                currentQuestionIndex = 0;
+                scores = [];
+                initCurrentQuestion();
+            });
+
+            // 滑动事件 - 移动端触摸
+            elements.questionContainer.addEventListener('touchstart', (e) => {
+                startX = e.touches[0].clientX;
+                e.preventDefault(); // 防止默认行为
+            });
+
+            elements.questionContainer.addEventListener('touchmove', (e) => {
+                e.preventDefault(); // 防止页面滚动
+            });
+
+            elements.questionContainer.addEventListener('touchend', (e) => {
+                const endX = e.changedTouches[0].clientX;
+                handleSwipe(startX, endX);
+            });
+
+            // 滑动事件 - PC端鼠标
+            elements.questionContainer.addEventListener('mousedown', (e) => {
+                startX = e.clientX;
+                elements.questionContainer.style.cursor = 'grabbing';
+            });
+
+            elements.questionContainer.addEventListener('mouseup', (e) => {
+                const endX = e.clientX;
+                elements.questionContainer.style.cursor = 'grab';
+                handleSwipe(startX, endX);
+            });
+
+            // 防止鼠标离开容器
+            elements.questionContainer.addEventListener('mouseleave', () => {
+                elements.questionContainer.style.cursor = 'grab';
+            });
+        }
+
+        // 初始化当前题目
+        function initCurrentQuestion() {
+            const currentQuestion = questions[currentQuestionIndex];
+            
+            // 更新题目信息
+            elements.questionNumber.textContent = `第${currentQuestion.id}题（${currentQuestion.dialect}）`;
+            elements.audioPlayer.src = currentQuestion.audioUrl;
+            
+            // 重置录音状态
+            resetRecordingState();
+            
+            // 隐藏结果区域
+            elements.resultContainer.classList.add('hidden');
+            
+            // 显示题目，隐藏完成提示
+            elements.questionContainer.classList.remove('hidden');
+            elements.completionMessage.classList.add('hidden');
+        }
+
+        // 切换录音状态
+        async function toggleRecording() {
+            if (isRecording) {
+                stopRecording();
+            } else {
+                await startRecording();
+            }
+        }
+
+        // 开始录音
+        async function startRecording() {
+            try {
+                // 请求麦克风权限
+                const stream = await navigator.mediaDevices.getUserMedia({ 
+                    audio: {
+                        echoCancellation: true,
+                        noiseSuppression: true,
+                        sampleRate: 44100
+                    }
+                });
+                
+                // 创建MediaRecorder实例
+                mediaRecorder = new MediaRecorder(stream);
+                audioChunks = [];
+                
+                // 收集录音数据
+                mediaRecorder.ondataavailable = (e) => {
+                    audioChunks.push(e.data);
+                };
+                
+                // 录音结束处理
+                mediaRecorder.onstop = () => {
+                    // 停止所有音轨
+                    stream.getTracks().forEach(track => track.stop());
+                    
+                    // 处理录音结果
+                    setTimeout(() => {
+                        processRecording();
+                    }, 500);
+                };
+                
+                // 开始录音
+                mediaRecorder.start();
+                isRecording = true;
+                
+                // 更新UI
+                updateRecordingUI(true);
+                
+                // 启动倒计时
+                startTimer();
+                
+                // 隐藏权限提示
+                elements.permissionTip.classList.add('hidden');
+                
+            } catch (error) {
+                console.error('录音错误:', error);
+                
+                if (error.name === 'NotAllowedError') {
+                    alert('❌ 麦克风权限被拒绝！请在浏览器设置中允许麦克风权限后重试');
+                } else if (error.name === 'NotFoundError') {
+                    alert('❌ 未检测到麦克风设备！请连接麦克风后重试');
+                } else {
+                    alert(`❌ 录音启动失败：${error.message}`);
+                }
+                
+                // 重置UI
+                updateRecordingUI(false);
+            }
+        }
+
+        // 停止录音
+        function stopRecording() {
+            if (mediaRecorder && isRecording) {
+                try {
+                    mediaRecorder.stop();
+                } catch (e) {
+                    console.error('停止录音错误:', e);
+                }
+            }
+            
+            // 清除计时器
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
+            
+            // 重置状态
+            isRecording = false;
+            
+            // 更新UI
+            updateRecordingUI(false);
+        }
+
+        // 重置录音状态
+        function resetRecordingState() {
+            stopRecording();
+            remainingTime = 15;
+            elements.timerText.textContent = remainingTime;
+            elements.progressBar.style.width = '100%';
+        }
+
+        // 更新录音UI状态
+        function updateRecordingUI(isActive) {
+            if (isActive) {
+                // 录音中状态
+                elements.recordBtn.classList.add('recording');
+                elements.recordBtn.innerHTML = '<i class="fas fa-stop text-white"></i>';
+                elements.timerContainer.classList.remove('hidden');
+                elements.recordStatus.classList.remove('hidden');
+                elements.recordStatus.textContent = '正在录音，请说出你听到的方言...';
+            } else {
+                // 停止录音状态
+                elements.recordBtn.classList.remove('recording');
+                elements.recordBtn.innerHTML = '<i class="fas fa-microphone text-gray-700"></i>';
+                elements.timerContainer.classList.add('hidden');
+                elements.recordStatus.classList.add('hidden');
+            }
+        }
+
+        // 启动倒计时
+        function startTimer() {
+            remainingTime = 15;
+            elements.timerText.textContent = remainingTime;
+            elements.progressBar.style.width = '100%';
+            
+            // 清除现有计时器
+            if (timerInterval) clearInterval(timerInterval);
+            
+            timerInterval = setInterval(() => {
+                remainingTime--;
+                elements.timerText.textContent = remainingTime;
+                
+                // 更新进度条
+                const progress = (remainingTime / 15) * 100;
+                elements.progressBar.style.width = `${progress}%`;
+                
+                // 倒计时结束
+                if (remainingTime <= 0) {
+                    clearInterval(timerInterval);
+                    stopRecording();
+                    elements.recordStatus.textContent = '录音时间结束，正在识别...';
+                }
+            }, 1000);
+        }
+
+        // 处理录音结果
+        function processRecording() {
+            if (audioChunks.length === 0) {
+                elements.userSpeechText.textContent = '未检测到声音，请重试';
+                elements.scoreText.textContent = 0;
+                showResult();
+                return;
+            }
+            
+            // 创建音频Blob
+            const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+            
+            // 检查语音识别支持
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SpeechRecognition) {
+                // 不支持语音识别时的降级处理
+                elements.userSpeechText.textContent = '浏览器不支持语音识别';
+                elements.scoreText.textContent = 0;
+                showResult();
+                return;
+            }
+            
+            // 创建识别实例
+            const recognition = new SpeechRecognition();
+            recognition.lang = 'zh-CN';
+            recognition.interimResults = false;
+            recognition.maxAlternatives = 1;
+            
+            // 识别成功
+            recognition.onresult = (event) => {
+                const userSpeech = event.results[0][0].transcript;
+                const currentQuestion = questions[currentQuestionIndex];
+                
+                // 计算相似度评分
+                const score = calculateSimilarityScore(userSpeech, currentQuestion.standardText);
+                scores[currentQuestionIndex] = score;
+                
+                // 更新结果
+                elements.scoreText.textContent = score;
+                elements.userSpeechText.textContent = userSpeech || '未识别';
+                elements.correctMeaningText.textContent = currentQuestion.meaning;
+                elements.dialectExplanationText.textContent = currentQuestion.explanation;
+                
+                // 显示结果
+                showResult();
+            };
+            
+            // 识别错误
+            recognition.onerror = (error) => {
+                console.error('语音识别错误:', error);
+                elements.userSpeechText.textContent = '识别失败，请重试';
+                elements.scoreText.textContent = 0;
+                scores[currentQuestionIndex] = 0;
+                
+                // 显示基础结果
+                const currentQuestion = questions[currentQuestionIndex];
+                elements.correctMeaningText.textContent = currentQuestion.meaning;
+                elements.dialectExplanationText.textContent = currentQuestion.explanation;
+                
+                showResult();
+            };
+            
+            // 启动识别
+            recognition.start();
+        }
+
+        // 显示结果
+        function showResult() {
+            elements.resultContainer.classList.remove('hidden');
+        }
+
+        // 计算文本相似度
+        function calculateSimilarityScore(userText, standardText) {
+            if (!userText || !standardText) return 0;
+            
+            // 清理文本
+            const clean = (text) => text.toLowerCase().replace(/[^\u4e00-\u9fa5a-z0-9]/g, '');
+            const userClean = clean(userText);
+            const standardClean = clean(standardText);
+            
+            // 完全匹配
+            if (userClean === standardClean) return 100;
+            
+            // 计算字符匹配度
+            let matchCount = 0;
+            const standardChars = standardClean.split('');
+            
+            for (const char of userClean) {
+                const idx = standardChars.indexOf(char);
+                if (idx !== -1) {
+                    matchCount++;
+                    standardChars.splice(idx, 1);
+                }
+            }
+            
+            // 计算得分
+            const maxLen = Math.max(standardClean.length, userClean.length);
+            const score = maxLen > 0 ? Math.round((matchCount / maxLen) * 100) : 0;
+            
+            return score;
+        }
+
+        // 处理滑动
+        function handleSwipe(startX, endX) {
+            const swipeThreshold = 30; // 滑动阈值
+            const swipeDistance = startX - endX;
+            
+            // 向左滑动
+            if (swipeDistance > swipeThreshold) {
+                if (currentQuestionIndex < questions.length - 1) {
+                    // 下一题
+                    currentQuestionIndex++;
+                    initCurrentQuestion();
+                    
+                    // 滑动动画反馈
+                    elements.questionContainer.style.opacity = '0.5';
+                    setTimeout(() => {
+                        elements.questionContainer.style.opacity = '1';
+                    }, 300);
+                } else {
+                    // 完成所有题目
+                    calculateTotalScore();
+                    elements.questionContainer.classList.add('hidden');
+                    elements.completionMessage.classList.remove('hidden');
+                }
+            }
+        }
+
+        // 计算总分
+        function calculateTotalScore() {
+            const validScores = scores.filter(score => !isNaN(score));
+            const avg = validScores.length 
+                ? Math.round(validScores.reduce((sum, s) => sum + s, 0) / validScores.length)
+                : 0;
+            elements.totalScore.textContent = avg;
+        }
+    </script>
+</body>
+</html>
